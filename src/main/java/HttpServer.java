@@ -87,8 +87,8 @@ public class HttpServer extends Thread {
 
                 out.write(Utils.getReponse(request));
 
-//                Thread.sleep(1000);
-//                socket.close(); // 关闭TCP连接
+                Thread.sleep(1000);
+                socket.close(); // 关闭TCP连接
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

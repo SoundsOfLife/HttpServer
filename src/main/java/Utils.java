@@ -62,8 +62,8 @@ public class Utils {
         return byte_3;
     }
 
-    public static String getURI(String request) {
-        String firstLine = request.substring(0, request.indexOf("\r\n"));
+    public static String getURI(String requestText) {
+        String firstLine = requestText.substring(0, requestText.indexOf("\r\n"));
         String[] parts = firstLine.split(" ");
 
         return parts[1];
@@ -97,13 +97,26 @@ public class Utils {
         return parts[0];
     }
 
+    public static String getResponseHead(String url, int statusCode) {
+        /* 创建HTTP响应结果 */
+        String contentType = getContentType(url);
+        StringBuffer sb = new StringBuffer();
+        // HTTP响应的第一行
+        String responseFirstLine = "HTTP/1.1 " + statusCode + " OK\r\n";
+        sb.append(responseFirstLine);
+        // HTTP响应头
+        String responseHeader = "Content-Type:" + contentType + "\r\n\r\n";
+        sb.append(responseHeader);
+
+        return sb.toString();
+    }
+
     public static byte[] getReponse(String requestText) throws Exception {
 
         StringBuffer sb = new StringBuffer();
 
         String url = getURI(requestText);
         String method = getMethod(requestText);
-        String requestType = getContentType(url);
 
         System.out.println(method);
 
@@ -111,32 +124,32 @@ public class Utils {
             InputStream htmlInputStream = null;
             try {
                 htmlInputStream = getResponseContent(url);
-                sb.append(_H_1_1_ + __ + _200_ + __ + _OK_);
-                sb.append(getGMTDate());
+                sb.append(getResponseHead(url, 200));
 
                 byte[] buffer = new byte[128];
+
                 int len = 0;
-                StringBuffer text = new StringBuffer();
                 if (htmlInputStream != null) {
-                    while ((len = htmlInputStream.read(buffer)) != -1)
-                        text.append(buffer);
+                    while ((len = htmlInputStream.read(buffer)) != -1) {
+                        String str = new String(buffer);
+                        sb.append(str);
+                    }
                 }
-                sb.append(text);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                sb.append(_H_1_1_ + __ + _404_ + __ + _OK_);
-                sb.append(getGMTDate());
+                sb.append(getResponseHead(url, 404));
             }
-        } else if (method == "POST") {
+        } else if (method.equals("POST")) {
 
-        } else if (method == "PUT") {
+        } else if (method.equals("PUT")) {
 
-        } else if (method == "DELETE") {
+        } else if (method.equals("DELETE")) {
 
         }
 
         System.out.println("Text:" + sb.toString());
 
-        return gzip(sb.toString().getBytes());
+//        return gzip(sb.toString().getBytes());
+        return sb.toString().getBytes();
     }
 }
