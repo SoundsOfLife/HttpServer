@@ -18,15 +18,15 @@ public class HttpServer extends Thread {
         return new String(requestBuff);
     }
 
-    public String getURI(String request) {
-        String firstLine = request.substring(0, request.indexOf("\r\n"));
+    public static String getURL(String requestText) {
+        String firstLine = requestText.substring(0, requestText.indexOf("\r\n"));
         String[] parts = firstLine.split(" ");
 
         return parts[1];
     }
 
-    public String getContentType(String URI) {
-        /* 决定HTTP响应正文的类型 */
+    public static String getContentType(String URI) {
+        // 决定HTTP响应正文的类型
         String contentType;
         if (URI.indexOf("html") != -1 || URI.indexOf("htm") != -1)
             contentType = "text/html";
@@ -39,26 +39,117 @@ public class HttpServer extends Thread {
         return contentType;
     }
 
-    public InputStream getResponseContent(String URI)
+    public static InputStream getResponseContent(String URI)
             throws FileNotFoundException {
         InputStream htmlInputStream = new FileInputStream(
                 System.getProperty("user.dir") + "/WebRoot" + URI);
         return htmlInputStream;
     }
 
-    public String assembleResponseHead(String URI, String contentType) {
-        /* 创建HTTP响应结果 */
-        // HTTP响应的第一行
-        String responseFirstLine = "HTTP/1.1 200 OK\r\n";
-        // HTTP响应头
-        String responseHeader = "Content-Type:" + contentType + "\r\n\r\n";
+    public static String getMethod(String requestText) {
+        String firstLine = requestText.substring(0, requestText.indexOf("\r\n"));
+        String[] parts = firstLine.split(" ");
 
-        return responseFirstLine + responseHeader;
+        return parts[0];
     }
 
-    @Override
-    public void start() {
+    public static String getResponseHead(String url, Integer statusCode, Integer contentLength) {
+        /* 创建HTTP响应结果 */
+        String contentType = getContentType(url);
+        StringBuffer sb = new StringBuffer();
 
+        // HTTP响应版本和状态码
+        String responseStatus = "HTTP/1.1 " + statusCode + " OK\r\n";
+        sb.append(responseStatus);
+
+        // HTTP响应文件类型
+        String responseContentType = "Content-Type:" + contentType + "\r\n";
+        sb.append(responseContentType);
+
+        // 响应日期
+        String responseDate = "Date: " + Utils.getGMTDate();
+        sb.append(responseDate);
+
+        // 响应服务器类型
+        String responseServer = "Server: kikyou\r\n";
+        sb.append(responseServer);
+
+//        String responseVary = "Vary: Accept-Encoding,User-Agent\r\n";
+//        sb.append(responseVary);
+
+//        String responseContentLength = "Content-Length: " + contentLength + "\r\n";
+//        sb.append(responseContentLength);
+
+        // HTTP响应压缩格式
+//        String responseContentEncoding = "Content-Encoding: gzip\r\n\r\n";
+//        sb.append(responseContentEncoding);
+
+        return sb.toString();
+    }
+
+    public static String Get(String url) {
+        StringBuilder sb = new StringBuilder();
+        InputStream htmlInputStream = null;
+        try {
+            htmlInputStream = getResponseContent(url);
+
+            StringBuilder temp = new StringBuilder();
+            byte[] buffer = new byte[128];
+
+            if (htmlInputStream != null) {
+                while (htmlInputStream.read(buffer) != -1) {
+                    temp.append(new String(buffer));
+                }
+            }
+//            byte[] text = Utils.gzip(temp.toString().getBytes());
+            byte[] text = temp.toString().getBytes();
+            sb.append(getResponseHead(url, 200, text.length));
+            sb.append(new String(text));
+        } catch (FileNotFoundException e) {
+            sb.append(getResponseHead(url, 404, 0));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sb.toString();
+    }
+
+    public static String Post() {
+        StringBuilder sb = new StringBuilder();
+        //TODO
+        return sb.toString();
+    }
+
+    public static String Put() {
+        StringBuilder sb = new StringBuilder();
+        //TODO
+        return sb.toString();
+    }
+
+    public static String Delete() {
+        StringBuilder sb = new StringBuilder();
+        //TODO
+        return sb.toString();
+    }
+
+    public static byte[] getResponse(String requestText) throws Exception {
+
+        StringBuilder sb = new StringBuilder();
+
+        String url = getURL(requestText);
+        String method = getMethod(requestText);
+
+        if (method.equals("GET")) {
+            sb.append(Get(url));
+        } else if (method.equals("POST")) {
+
+        } else if (method.equals("PUT")) {
+
+        } else if (method.equals("DELETE")) {
+
+        }
+
+        System.out.println(sb.toString());
+        return sb.toString().getBytes();
     }
 
     public void service() throws InterruptedException {
@@ -69,23 +160,9 @@ public class HttpServer extends Thread {
 
                 String request = getRequest(socket);
                 System.out.println("HttpServer receive request:\n" + request);
-//
-//                String URI = getURI(request);
-//
-//                String contentType = getContentType(URI);
                 OutputStream out = socket.getOutputStream();
 
-//                out.write(assembleResponseHead(URI, contentType).getBytes());
-
-//                int len = 0;
-//                byte[] outdata = assembleResponseHead(URI, contentType).getBytes();
-
-//                byte[] buffer = new byte[128];
-//                InputStream htmlInputStream = getResponseContent(URI);
-//                while ((len = htmlInputStream.read(buffer)) != -1)
-//                    outdata = Utils.byteMerger(buffer, outdata);
-
-                out.write(Utils.getReponse(request));
+                out.write(getResponse(request));
 
                 Thread.sleep(1000);
                 socket.close(); // 关闭TCP连接
