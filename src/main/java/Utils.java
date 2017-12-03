@@ -40,7 +40,7 @@ public class Utils {
 
     public static String getGMTDate() {
         Calendar cd = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss 'GMT'\r\n", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss 'GMT'", Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT")); // 设置时区为GMT
         String str = sdf.format(cd.getTime());
         return str;
@@ -52,6 +52,7 @@ public class Utils {
         System.arraycopy(byte_2, 0, byte_3, byte_1.length, byte_2.length);
         return byte_3;
     }
+
 
 
 }
