@@ -24,20 +24,8 @@ public class Main {
             while (true) {
                 try {
                     socket = serverSocket.accept();
-
-                    InputStream socketIn = socket.getInputStream();
-                    int size = socketIn.available();
-                    byte[] requestBuff = new byte[size];
-                    socketIn.read(requestBuff);
-                    String requestText = new String(requestBuff);
-
-                    if (requestText.length() > 0) {
-                        System.out.println(i++);
-                        ExecutorThread requestThread = new ExecutorThread(requestText);
-                        executor.execute(requestThread);
-                    }
-                    Thread.sleep(1000);
-                    socket.close();
+                    ExecutorThread requestThread = new ExecutorThread(socket);
+                    executor.execute(requestThread);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (Exception e) {

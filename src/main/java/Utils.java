@@ -53,6 +53,14 @@ public class Utils {
         return byte_3;
     }
 
-
-
+    public static byte[] getHtml(String url) throws IOException {
+        InputStream inputStream = new FileInputStream(
+                System.getProperty("user.dir") + "/WebRoot" + url);
+        byte[] buffer = new byte[1024];
+        StringBuilder temp = new StringBuilder();
+        while (inputStream.read(buffer) != -1) {
+            temp.append(new String(buffer));
+        }
+        return temp.toString().getBytes();
+    }
 }
