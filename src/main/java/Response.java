@@ -1,6 +1,6 @@
 public class Response {
 
-    private String status = "HTTP/1.1 " + 200 + "OK\r\n";
+    private String status = "HTTP/1.1 200 OK\r\n";
     private String date = "Date: " + Utils.getGMTDate() + "\r\n";
     private String server = "server: kikyou1.0\r\n";
     private String contentEncoding = "Content_Encoding: gzip\r\n";
@@ -34,17 +34,19 @@ public class Response {
     }
 
     public Response(String status, String contentType, String text) {
-        this.status = "HTTP/1.1 " + status + "\r\n";
+        this.status = "HTTP/1.1 " + status + " OK\r\n";
         this.contentType = "Content_Type: " + contentType + "\r\n";
         this.text = text;
     }
 
     public byte[] getResponse() {
         StringBuilder sb = new StringBuilder();
-        sb.append(status);
-        sb.append(contentType);
-        sb.append(text);
+        sb.append(this.status);
+        sb.append(this.contentType);
         sb.append("\r\n");
+        if (this.text != null) {
+            sb.append(this.text);
+        }
         return sb.toString().getBytes();
     }
 
@@ -53,7 +55,7 @@ public class Response {
     }
 
     public void setStatus(String status) {
-        this.status = status;
+        this.status = "HTTP/1.1 " + status + " OK\r\n";
     }
 
     public String getDate() {

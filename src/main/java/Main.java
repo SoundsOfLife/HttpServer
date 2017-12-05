@@ -16,7 +16,6 @@ public class Main {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 200, TimeUnit.MILLISECONDS,
                 new ArrayBlockingQueue<Runnable>(5));
 
-        int i = 0;
         Socket socket;
         ServerSocket serverSocket = null;
         try {

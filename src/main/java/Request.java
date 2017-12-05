@@ -16,13 +16,11 @@ public class Request {
     public Request(String requestText) {
         String[] lines = requestText.split("\r\n\r\n");
         if (lines.length == 1) {
-            if (lines.length > 0) {
-                String[] headers = lines[0].split("\r\n");
-                String[] header = headers[0].split(" ");
-                method = header[0];
-                url = header[1];
-            }
-        } else {
+            String[] headers = lines[0].split("\r\n");
+            String[] header = headers[0].split(" ");
+            method = header[0];
+            url = header[1];
+        } else if (lines.length > 0) {
             String text = lines[1];
             String[] headers = lines[0].split("\r\n");
             String[] header = headers[0].split(" ");

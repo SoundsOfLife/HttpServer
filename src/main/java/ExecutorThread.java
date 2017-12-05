@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class ExecutorThread implements Runnable {
@@ -19,8 +20,10 @@ public class ExecutorThread implements Runnable {
             socketIn.read(requestBuff);
             String requestText = new String(requestBuff);
 
+            System.out.println(requestText);
+
             Request request = new Request(requestText);
-            String method = request.getMethod();
+
             String url = request.getUrl();
             Response response = new Response();
             try {
@@ -30,7 +33,11 @@ public class ExecutorThread implements Runnable {
             } catch (IOException e) {
                 response.setStatus("404");
             }
-            
+
+            OutputStream out = socket.getOutputStream();
+            System.out.println(new String(response.getResponse()));
+            out.write(response.getResponse());
+
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
